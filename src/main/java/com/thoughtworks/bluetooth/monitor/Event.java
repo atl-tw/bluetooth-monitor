@@ -25,4 +25,6 @@ public abstract class Event {
                 null;
         return java.util.Optional.ofNullable(mac);
     }
+
+    public abstract String toJsonString();
 }

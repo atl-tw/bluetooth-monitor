@@ -1,7 +1,15 @@
+buildscript {
+    repositories { jcenter() }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
+    }
+}
+
 group 'com.thoughtworks'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'java'
+apply plugin: 'com.github.johnrengelman.shadow'
 
 sourceCompatibility = 1.8
 
@@ -12,5 +20,18 @@ repositories {
 dependencies {
     compile 'com.google.guava:guava:19.0'
     compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.0.2'
+    compile 'com.grack:nanojson:1.0'
+    compile 'com.google.api-client:google-api-client:1.21.0'
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }
+
+shadowJar {
+
+}
+
+jar {
+    manifest {
+        attributes("Main-Class": "com.thoughtworks.bluetooth.monitor.RunWatcher")
+    }
+}
+

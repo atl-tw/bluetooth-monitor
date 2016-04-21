@@ -25,10 +25,10 @@ public class Watcher {
             .concurrencyLevel(128)
             .build();
     private final Callable<CopyOnWriteArrayList<Listener>> callable = CopyOnWriteArrayList::new;
-    private final AtomicBoolean running = new AtomicBoolean(false);
+    private final AtomicBoolean running = new AtomicBoolean(true);
 
 
-    public Watcher(Stream<InputStream> inputs){
+    private Watcher(Stream<InputStream> inputs){
         inputs.map((is) -> {
             return new Thread( () ->{
                 BufferedReader reader = new BufferedReader(new InputStreamReader(is));
@@ -41,19 +41,21 @@ public class Watcher {
                                     .append('\n');
                         } else {
                             parseAndDispatch(pack);
-                            pack = new StringBuilder();
+                            System.out.println("-----------------------------------\n"+pack);
+                            pack = new StringBuilder(line);
                         }
-
-
                     }
                 } catch (IOException e) {
                     LOGGER.log(Level.SEVERE, "IO Exception reading from input stream.", e);
                 }
+                System.out.println("Thread exiting.");
             });
         }).forEach((t) -> {
             t.setDaemon(true);
             t.start();
+            System.out.println("Thread up.");
         });
+        System.out.println("Watcher started.");
     }
 
 
@@ -95,6 +97,10 @@ public class Watcher {
         } catch (ExecutionException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static Watcher startWatcher(Stream<InputStream> stream){
+        return new Watcher(stream);
     }
 
 

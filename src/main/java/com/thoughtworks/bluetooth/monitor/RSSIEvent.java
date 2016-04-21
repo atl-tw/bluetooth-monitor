@@ -1,6 +1,9 @@
 package com.thoughtworks.bluetooth.monitor;
 
 import com.google.common.base.Splitter;
+import com.grack.nanojson.JsonObject;
+import com.grack.nanojson.JsonParser;
+import com.grack.nanojson.JsonWriter;
 
 import java.util.List;
 import java.util.Optional;
@@ -52,5 +55,20 @@ public class RSSIEvent extends Event {
             }
         }
         return null;
+    }
+
+    @Override
+    public String toJsonString(){
+        return JsonWriter.string()
+                .object()
+                    .value("type", "rssi")
+                    .value("mac", macAddress)
+                    .value("signalStrength", signalStrength)
+                .end()
+                .done();
+    }
+
+    public static RSSIEvent parseJson(JsonObject o){
+        return new RSSIEvent(o.getString("mac"), o.getInt("signalStrength"));
     }
 }

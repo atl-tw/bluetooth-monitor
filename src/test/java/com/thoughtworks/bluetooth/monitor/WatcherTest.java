@@ -16,7 +16,7 @@ import static org.junit.Assert.*;
 public class WatcherTest {
     @Test
     public void dispatchHciEvent() throws Exception {
-        Watcher watcher = new Watcher(Stream.empty());
+        Watcher watcher = Watcher.startWatcher(Stream.empty());
         List<Event> events = new ArrayList<>(2);
         Set<Class> classes = new HashSet<>(2);
         watcher.addListener(RSSIEvent.class, e ->  { events.add(e); classes.add(e.getClass()); } );

@@ -1,6 +1,9 @@
 package com.thoughtworks.bluetooth.monitor;
 
 import com.google.common.base.Splitter;
+import com.grack.nanojson.JsonObject;
+import com.grack.nanojson.JsonParser;
+import com.grack.nanojson.JsonWriter;
 
 import java.util.Optional;
 import java.util.logging.Logger;
@@ -25,6 +28,17 @@ public class DeviceInfoEvent extends Event {
     }
 
 
+    @Override
+    public String toJsonString() {
+        return JsonWriter.string()
+                .object()
+                    .value("mac", macAddress)
+                    .value("company", company)
+                    .value("type", type)
+                .end()
+                .done();
+    }
+
     public static Optional<DeviceInfoEvent> parsePacket(String macAddress, String data){
         if(!data.startsWith("> HCI Event: LE Meta Event")){
             return Optional.empty();
@@ -48,4 +62,10 @@ public class DeviceInfoEvent extends Event {
         );
         return Optional.of(new DeviceInfoEvent(macAddress, company, type));
     }
+
+
+    public static DeviceInfoEvent parseJson(JsonObject o){
+        return new DeviceInfoEvent(o.getString("mac"), o.getString("company"), o.getString("type"));
+    }
+
 }
