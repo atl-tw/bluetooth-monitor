@@ -1,11 +1,7 @@
 package com.thoughtworks.bluetooth.monitor;
 
-import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.junit.Test;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by rcooper on 4/21/16.
@@ -21,12 +17,12 @@ public class MqttPublisherTest {
         String broker       = "tcp://atliot.com:1883";
         String clientId     = "BTMonitor";
         MemoryPersistence persistence = new MemoryPersistence();
-//        MqttClient sampleClient = new MqttClient(broker, clientId, persistence);
+//        Mqtt client = new Mqtt(broker, clientId, persistence);
 //        MqttConnectOptions connOpts = new MqttConnectOptions();
 //        connOpts.setCleanSession(true);
-//        sampleClient.connect(connOpts);
-//        sampleClient.subscribe("bluetooth");
-//        sampleClient.setCallback(new MqttCallback() {
+//        client.connect(connOpts);
+//        client.subscribe("bluetooth");
+//        client.setCallback(new MqttCallback() {
 //            @Override
 //            public void connectionLost(Throwable cause) {
 //                cause.printStackTrace();
@@ -43,13 +39,11 @@ public class MqttPublisherTest {
 //            }
 //        });
 
-        Thread.sleep(5000);
-
-        MqttPublisher publisher = new MqttPublisher();
+        Publisher publisher = new Publisher();
         publisher.connect();
 
 
-        publisher.onEvent(new RSSIEvent("abc", 123));
+        publisher.onEvent(new RSSIEvent("test", "abc", 123));
     }
 
 }

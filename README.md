@@ -34,3 +34,21 @@ the location, and publishes another MQTT event to store the position
 information for the device.
 
 You just need to run a single Tracker.
+
+
+Build
+-----
+
+"gradle shadowJar" will build an executable jar with all of the dependencies.
+
+
+Run
+---
+
+To run the Watcher, simply do:
+
+sudo java -jar bluetooth-monitor-1.0-SNAPSHOT-all.jar
+
+To run the Tracker:
+
+java -cp bluetooth-monitor-1.0-SNAPSHOT-all.jar com.thoughtworks.bluetooth.monitor.RunTracker

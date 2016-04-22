@@ -7,6 +7,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
@@ -26,9 +28,15 @@ public class Watcher {
             .build();
     private final Callable<CopyOnWriteArrayList<Listener>> callable = CopyOnWriteArrayList::new;
     private final AtomicBoolean running = new AtomicBoolean(true);
-
+    private String hostname;
 
     private Watcher(Stream<InputStream> inputs){
+        try {
+            hostname = InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+            LOGGER.log(Level.SEVERE, "Failed to get host name.");
+            hostname = "UNKNOWN";
+        }
         inputs.map((is) -> {
             return new Thread( () ->{
                 BufferedReader reader = new BufferedReader(new InputStreamReader(is));
@@ -36,26 +44,26 @@ public class Watcher {
                 StringBuilder pack = new StringBuilder();
                 try {
                     while(running.get() && (line = reader.readLine()) != null){
+                        //System.out.println("## "+Thread.currentThread().getId() +" "+line);
                         if(line.charAt(0) == ' '){
                             pack.append(line)
                                     .append('\n');
                         } else {
                             parseAndDispatch(pack);
-                            System.out.println("-----------------------------------\n"+pack);
-                            pack = new StringBuilder(line);
+                            pack = new StringBuilder(line).append("\n");
                         }
                     }
                 } catch (IOException e) {
                     LOGGER.log(Level.SEVERE, "IO Exception reading from input stream.", e);
                 }
-                System.out.println("Thread exiting.");
+                LOGGER.info(String.format("Thread %d exiting.", Thread.currentThread().getId()));
             });
         }).forEach((t) -> {
             t.setDaemon(true);
             t.start();
-            System.out.println("Thread up.");
+            LOGGER.info(String.format("Thread %d starting.", Thread.currentThread().getId()));
         });
-        System.out.println("Watcher started.");
+        LOGGER.info("Watcher started.");
     }
 
 
@@ -64,9 +72,9 @@ public class Watcher {
         final String str = data.toString();
         Event.extractMacAddress(str)
                 .ifPresent((mac) ->{
-                    RSSIEvent.parsePacket(mac, str)
+                    RSSIEvent.parsePacket(hostname, mac, str)
                             .ifPresent(this::dispatch);
-                    DeviceInfoEvent.parsePacket(mac, str)
+                    DeviceInfoEvent.parsePacket(hostname, mac, str)
                             .ifPresent(this::dispatch);
                 });
 

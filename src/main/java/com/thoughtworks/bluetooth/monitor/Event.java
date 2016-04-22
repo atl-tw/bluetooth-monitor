@@ -11,9 +11,11 @@ public abstract class Event {
 
     private static final Pattern MAC_ADDRESS_PATTERN = Pattern.compile("(([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2}))");
 
+    public final String hostname;
     public final String macAddress;
 
-    protected Event(String macAddress) {
+    protected Event(String hostname, String macAddress) {
+        this.hostname = hostname;
         this.macAddress = macAddress;
     }
 

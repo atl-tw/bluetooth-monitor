@@ -11,7 +11,7 @@ public class DeviceInfoEventTest {
 
     @Test
     public void parsePacket() throws Exception {
-        DeviceInfoEvent even = DeviceInfoEvent.parsePacket("abc", TestConstants.HCI_EVENT).get();
+        DeviceInfoEvent even = DeviceInfoEvent.parsePacket("test","abc", TestConstants.HCI_EVENT).get();
         assertEquals("Apple, Inc.", even.company);
         assertEquals("Apple TV", even.type);
     }

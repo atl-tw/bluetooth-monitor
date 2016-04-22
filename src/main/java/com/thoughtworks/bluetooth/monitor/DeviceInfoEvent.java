@@ -21,8 +21,8 @@ public class DeviceInfoEvent extends Event {
     public final String company;
     public final String type;
 
-    public DeviceInfoEvent(String macAddress, String company, String type) {
-        super(macAddress);
+    public DeviceInfoEvent(String hostname, String macAddress, String company, String type) {
+        super(hostname, macAddress);
         this.company = company;
         this.type = type;
     }
@@ -32,14 +32,16 @@ public class DeviceInfoEvent extends Event {
     public String toJsonString() {
         return JsonWriter.string()
                 .object()
+                    .value("type", "deviceInfo")
+                    .value("hostname", hostname)
                     .value("mac", macAddress)
                     .value("company", company)
-                    .value("type", type)
+                    .value("deviceType", type)
                 .end()
                 .done();
     }
 
-    public static Optional<DeviceInfoEvent> parsePacket(String macAddress, String data){
+    public static Optional<DeviceInfoEvent> parsePacket(String hostname, String macAddress, String data){
         if(!data.startsWith("> HCI Event: LE Meta Event")){
             return Optional.empty();
         }
@@ -60,12 +62,15 @@ public class DeviceInfoEvent extends Event {
                         .append(type)
                         .toString()
         );
-        return Optional.of(new DeviceInfoEvent(macAddress, company, type));
+        return Optional.of(new DeviceInfoEvent(hostname, macAddress, company, type));
     }
 
 
     public static DeviceInfoEvent parseJson(JsonObject o){
-        return new DeviceInfoEvent(o.getString("mac"), o.getString("company"), o.getString("type"));
+        return new DeviceInfoEvent(o.getString("hostname"),
+                o.getString("mac"),
+                o.getString("company"),
+                o.getString("deviceType"));
     }
 
 }

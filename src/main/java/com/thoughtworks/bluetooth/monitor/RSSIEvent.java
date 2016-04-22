@@ -21,16 +21,16 @@ public class RSSIEvent extends Event {
     public static final String RSSI = "rssi";
     public final int signalStrength;
 
-    public RSSIEvent(String macAddress, int signalStrength) {
-        super(macAddress);
+    public RSSIEvent(String hostname, String macAddress, int signalStrength) {
+        super(hostname, macAddress);
         this.signalStrength = signalStrength;
     }
 
 
-    public static Optional<RSSIEvent> parsePacket(final String macAddress, String packet){
+    public static Optional<RSSIEvent> parsePacket(final String hostname, final String macAddress, String packet){
         Iterable<String> lines = LINE_SPLITTER.split(packet);
         for(String line : lines){
-            RSSIEvent event = parseLine(macAddress, line);
+            RSSIEvent event = parseLine(hostname, macAddress, line);
             if(event != null){
                 return Optional.of(event);
             }
@@ -38,7 +38,7 @@ public class RSSIEvent extends Event {
         return Optional.empty();
     }
 
-    private static RSSIEvent parseLine(String macAddress, String line){
+    private static RSSIEvent parseLine(String hostname, String macAddress, String line){
         line = line.toLowerCase();
         if(line.contains(RSSI)){
             List<String> tokens = TOKEN_SPLITTER.splitToList(line);
@@ -47,7 +47,7 @@ public class RSSIEvent extends Event {
                     String value = tokens.get(i + 1);
                     try {
                         int read = Integer.valueOf(value);
-                        return new RSSIEvent(macAddress, read);
+                        return new RSSIEvent(hostname, macAddress, read);
                     } catch(NumberFormatException nfe){
                         LOGGER.warning(String.format("Failed to parse %s from line: \"%s\"", value, line));
                     }
@@ -61,6 +61,7 @@ public class RSSIEvent extends Event {
     public String toJsonString(){
         return JsonWriter.string()
                 .object()
+                    .value("hostname", hostname)
                     .value("type", "rssi")
                     .value("mac", macAddress)
                     .value("signalStrength", signalStrength)
@@ -69,6 +70,6 @@ public class RSSIEvent extends Event {
     }
 
     public static RSSIEvent parseJson(JsonObject o){
-        return new RSSIEvent(o.getString("mac"), o.getInt("signalStrength"));
+        return new RSSIEvent(o.getString("hostname"), o.getString("mac"), o.getInt("signalStrength"));
     }
 }

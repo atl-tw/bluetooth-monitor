@@ -28,23 +28,38 @@ public class BluetoothCtl {
         checkState(proc.isAlive(), "bluetoothctl process has died.");
     }
 
+    private void cmd(String command){
+        writer.println(command);
+        writer.flush();
+        sleep(300);
+    }
+
     public void powerUpAndScan(){
-        writer.println("power on");
-        writer.println("agent on");
-        writer.println("discoverable on");
-        writer.println("scan on");
+        cmd("power on");
+        cmd("agent on");
+        cmd("discoverable on");
+        cmd("scan on");
+
     }
 
     public void powerOff(){
-        writer.println("power off");
+        checkProc();
+        cmd("power off");
     }
 
     public void powerCycle(){
+        checkProc();
         powerOff();
         powerUpAndScan();
     }
 
+    private void sleep(long ms){
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException e) {
 
+        }
+    }
 
 
 

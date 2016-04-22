@@ -12,12 +12,9 @@ public class RunWatcher {
     public static void main(String... args) throws Exception {
 
         Process leScan = Runtime.getRuntime().exec("hcitool lescan");
-        System.out.println("lescan started");
         Process btmon = Runtime.getRuntime().exec("btmon");
-        System.out.println("btmon started");
         BluetoothCtl bluetoothCtl = new BluetoothCtl();
         bluetoothCtl.powerCycle();
-        System.out.println("bluetoothctl started");
         Watcher watcher = Watcher.startWatcher(
                 Stream.of(
                         leScan.getInputStream(),
@@ -25,7 +22,7 @@ public class RunWatcher {
                         btmon.getInputStream()
                 )
         );
-        MqttPublisher publisher = new MqttPublisher();
+        Publisher publisher = new Publisher();
         publisher.connect();
         watcher.addListener(RSSIEvent.class, publisher);
         watcher.addListener(DeviceInfoEvent.class, publisher);
